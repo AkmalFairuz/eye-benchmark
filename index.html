@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My First Web Page</title>
+</head>
+<body style="background-color:#00d0ff; font-family: sans-serif;">
+<div onclick="handleClick()" style="display: flex; height: 100vh; width: 100%; flex-direction: column; justify-content: center; align-items: center">
+    <div style="font-size: 40px; text-align: center" id="textBox">
+        Klik untuk memulai
+    </div>
+</div>
+
+<script>
+    const lang = {
+        "en": {
+            "start": "Click to start",
+            "waiting": "Click when the color changes to yellow",
+            "clickNow": "Click now!",
+            "tooFast": "You are too fast!",
+            "success": "Congratulations! You clicked in ",
+            "miliseconds": " miliseconds",
+            "clickToRestart": "Click to restart"
+        },
+        "id": {
+            "start": "Klik untuk memulai",
+            "waiting": "Klik ketika warna berubah menjadi warna kuning",
+            "clickNow": "Klik sekarang!",
+            "tooFast": "Anda terlalu cepat!",
+            "success": "Selamat! Anda berhasil mengklik dalam ",
+            "miliseconds": " milidetik",
+            "clickToRestart": "Klik untuk memulai ulang"
+        }
+    }
+
+    let language = "en";
+    let start = false;
+    let mustClick = false;
+    let mustClickDate = null;
+    let finished = false;
+    let timeoutHandler = null;
+
+    function restart() {
+        document.body.style.backgroundColor = "#00d0ff";
+        document.getElementById("textBox").innerText = lang[language].start;
+        finished = false;
+        mustClick = false;
+        mustClickDate = null;
+        start = false;
+        clearTimeout(timeoutHandler);
+    }
+
+    function handleClick() {
+        if(finished) {
+            restart();
+            return;
+        }
+        if(start) {
+            clearTimeout(timeoutHandler);
+            if(mustClick) {
+                const now = new Date();
+                const diff = now - mustClickDate;
+                document.getElementById("textBox").innerText = lang[language].success + diff + lang[language].miliseconds;
+                document.body.style.backgroundColor = "#00ff00";
+            } else {
+                document.getElementById("textBox").innerText = lang[language].tooFast;
+                document.body.style.backgroundColor = "#ff0000";
+            }
+            finished = true;
+            return;
+        }
+        start = true;
+        document.body.style.backgroundColor = "#0066ff";
+        document.getElementById("textBox").innerText = lang[language].waiting;
+
+        const randomTime = Math.floor(Math.random() * 5500) + 2500;
+        timeoutHandler = setTimeout(() => {
+            setMustClick()
+        }, randomTime);
+    }
+
+    function setMustClick() {
+        mustClick = true;
+        mustClickDate = new Date();
+        document.body.style.backgroundColor = "#f6ff00";
+        document.getElementById("textBox").innerText = lang[language].clickNow;
+    }
+
+    function init() {
+        if(navigator.language.startsWith("id")) {
+            language = "id";
+        } else {
+            language = "en";
+        }
+
+        restart();
+    }
+
+    init();
+</script>
+</body>
+</html>

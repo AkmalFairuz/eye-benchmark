@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Eye Benchmark</title>
+</head>
+<body style="background-color:#00d0ff; font-family: sans-serif;">
+<div onclick="startGame();" style="display: flex; height: 100vh; width: 100%; flex-direction: column; justify-content: center; align-items: center">
+    <div style="font-size: 40px; text-align: center" id="textBox"/>
+</div>
+
+<script>
+    const lang = {
+        "en": {
+            "start": "Click to start.\nPlayer 1 Press Z\nPlayer 2 Press M",
+            "clickNow": "Click now!",
+            "waiting": "Click when the color changes to yellow.\nPlayer 1: Press Z\nPlayer 2: Press M",
+            "player1TooFast": "Player 1 is too fast!",
+            "player1ClickedMore": "Player 1 clicked twice",
+            "player2TooFast": "Player 2 is too fast!",
+            "player2ClickedMore": "Player 2 clicked twice",
+            "player1Win": "Player 1 wins!",
+            "player2Win": "Player 2 wins!",
+            "player1Click": "Player 1 clicked in ",
+            "player2Click": "Player 2 clicked in ",
+            "miliseconds": " miliseconds",
+            "clickToRestart": "Click to restart"
+        },
+        "id": {
+            "start": "Klik untuk memulai.\nPlayer 1 Tekan Z\nPlayer 2 Tekan M",
+            "clickNow": "Klik sekarang!",
+            "waiting": "Klik ketika warna berubah menjadi warna kuning.\nPlayer 1: Tekan Z\nPlayer 2: Tekan M",
+            "player1TooFast": "Player 1 terlalu cepat!",
+            "player1ClickedMore": "Player 1 mengklik dua kali",
+            "player2TooFast": "Player 2 terlalu cepat!",
+            "player2ClickedMore": "Player 2 mengklik dua kali",
+            "player1Win": "Player 1 menang!",
+            "player2Win": "Player 2 menang!",
+            "player1Click": "Player 1 mengklik dalam ",
+            "player2Click": "Player 2 mengklik dalam ",
+            "miliseconds": " milidetik",
+            "clickToRestart": "Klik untuk memulai ulang"
+        }
+    }
+
+    let language = "en";
+    let start = false;
+    let mustClick = false;
+    let mustClickDate = null;
+    let finished = false;
+    let timeoutHandler = null;
+    let player1ClickDate = null;
+
+    function restart() {
+        document.body.style.backgroundColor = "#00d0ff";
+        document.getElementById("textBox").innerText = lang[language].start;
+        finished = false;
+        mustClick = false;
+        mustClickDate = null;
+        start = false;
+        player1ClickDate = null;
+        player2ClickDate = null;
+        clearTimeout(timeoutHandler);
+    }
+
+    function setMustClick() {
+        mustClick = true;
+        mustClickDate = new Date();
+        document.body.style.backgroundColor = "#f6ff00";
+        document.getElementById("textBox").innerText = lang[language].clickNow;
+    }
+
+    function startGame() {
+        if(finished) {
+            restart();
+            return;
+        }
+        if(start) {
+            return;
+        }
+        start = true;
+        document.body.style.backgroundColor = "#0066ff";
+        document.getElementById("textBox").innerText = lang[language].waiting;
+
+        const randomTime = Math.floor(Math.random() * 5500) + 2500;
+        timeoutHandler = setTimeout(() => {
+            setMustClick()
+        }, randomTime);
+    }
+
+    function fail(reason) {
+        clearTimeout(timeoutHandler);
+        document.body.style.backgroundColor = "#ff0000";
+        document.getElementById("textBox").innerText = reason
+        finished = true;
+    }
+
+    function success() {
+        document.body.style.backgroundColor = "#00ff00";
+        document.getElementById("textBox").innerText = (player1ClickDate < player2ClickDate ? lang[language].player1Win : lang[language].player2Win) + "\n\n" + lang[language].player1Click + (player1ClickDate - mustClickDate) + lang[language].miliseconds + "\n" + lang[language].player2Click + (player2ClickDate - mustClickDate) + lang[language].miliseconds + "\n\n" + lang[language].clickToRestart
+        finished = true;
+        clearTimeout(timeoutHandler);
+    }
+
+    function init() {
+        // detect system language
+        if(navigator.language === "id") {
+            language = "id";
+        } else {
+            language = "en";
+        }
+
+        restart();
+
+        // detect keypress
+        document.addEventListener("keypress", (e) => {
+            if(start && !finished && (e.key === "z" || e.key === "m")) {
+                const isPlayer1 = e.key === "z";
+
+                if(!mustClick) {
+                    fail(isPlayer1 ? lang[language].player1TooFast : lang[language].player2TooFast)
+                    return;
+                }
+
+                if(isPlayer1) {
+                    if(player1ClickDate === null) {
+                        player1ClickDate = new Date();
+                    } else {
+                        fail(lang[language].player1ClickedMore)
+                    }
+                } else {
+                    if(player2ClickDate === null) {
+                        player2ClickDate = new Date();
+                    }else{
+                        fail(lang[language].player2ClickedMore)
+                    }
+                }
+
+                if(player1ClickDate !== null && player2ClickDate !== null) {
+                    success()
+                }
+            }
+        });
+    }
+
+    init();
+</script>
+</body>
+</html>
