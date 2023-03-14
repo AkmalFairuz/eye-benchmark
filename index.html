@@ -4,10 +4,8 @@
 <title>Eye Benchmark</title>
 </head>
 <body style="background-color:#00d0ff; font-family: sans-serif;">
-<div onclick="handleClick()" style="display: flex; height: 100vh; width: 100%; flex-direction: column; justify-content: center; align-items: center">
-    <div style="font-size: 40px; text-align: center" id="textBox">
-        Klik untuk memulai
-    </div>
+<div onmousedown="handleClick()" style="display: flex; height: 100vh; width: 100%; flex-direction: column; justify-content: center; align-items: center">
+    <div style="font-size: 40px; text-align: center" id="textBox"></div>
 </div>
 
 <script>
@@ -35,7 +33,7 @@
     let language = "en";
     let start = false;
     let mustClick = false;
-    let mustClickDate = null;
+    let mustClickTimestamp = null;
     let finished = false;
     let timeoutHandler = null;
 
@@ -44,7 +42,7 @@
         document.getElementById("textBox").innerText = lang[language].start;
         finished = false;
         mustClick = false;
-        mustClickDate = null;
+        mustClickTimestamp = null;
         start = false;
         clearTimeout(timeoutHandler);
     }
@@ -57,8 +55,8 @@
         if(start) {
             clearTimeout(timeoutHandler);
             if(mustClick) {
-                const now = new Date();
-                const diff = now - mustClickDate;
+                const now = window.performance.now();
+                const diff = now - mustClickTimestamp;
                 document.getElementById("textBox").innerText = lang[language].success + diff + lang[language].miliseconds;
                 document.body.style.backgroundColor = "#00ff00";
             } else {
@@ -80,7 +78,7 @@
 
     function setMustClick() {
         mustClick = true;
-        mustClickDate = new Date();
+        mustClickTimestamp = window.performance.now();
         document.body.style.backgroundColor = "#f6ff00";
         document.getElementById("textBox").innerText = lang[language].clickNow;
     }

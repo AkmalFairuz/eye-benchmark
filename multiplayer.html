@@ -5,7 +5,7 @@
 </head>
 <body style="background-color:#00d0ff; font-family: sans-serif;">
 <div onclick="startGame();" style="display: flex; height: 100vh; width: 100%; flex-direction: column; justify-content: center; align-items: center">
-    <div style="font-size: 40px; text-align: center" id="textBox"/>
+    <div style="font-size: 40px; text-align: center" id="textBox"></div>
 </div>
 
 <script>
@@ -103,7 +103,7 @@
 
     function init() {
         // detect system language
-        if(navigator.language === "id") {
+        if(navigator.language.startsWith("id")) {
             language = "id";
         } else {
             language = "en";
