@@ -83,13 +83,28 @@
         document.getElementById("textBox").innerText = lang[language].clickNow;
     }
 
-    function init() {
-        if(navigator.language.startsWith("id")) {
-            language = "id";
-        } else {
-            language = "en";
+    function setupLanguage() {
+        if(localStorage.getItem("language") !== null) {
+            language = localStorage.getItem("language");
+            return;
         }
+        fetch("https://ipapi.co/json/").then((response) => {
+            return response.json();
+        }).then((data) => {
+            if(data["country"] === "ID") {
+                language = "id";
+            } else {
+                language = "en";
+            }
+            localStorage.setItem("language", language);
+            if(!start) {
+                restart();
+            }
+        });
+    }
 
+    function init() {
+        setupLanguage();
         restart();
     }
 
